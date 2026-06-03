@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:background="#F5F5F5">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="제주도 여행"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2026-06-03"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:id="@+id/tvMemo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="흑돼지 맛있었다"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

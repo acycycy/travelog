@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Travelog">
         <activity
+            android:name=".AddTravelActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
