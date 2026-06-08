@@ -61,15 +61,21 @@ class TravelDatabaseHelper(context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
                 val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
                 val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE))
                 val memo = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MEMO))
 
-                travelList.add(Travel(title, date, memo))
+                travelList.add(Travel(id, title, date, memo))
             } while (cursor.moveToNext())
         }
 
         cursor.close()
         return travelList
+    }
+
+    fun deleteTravel(id: Int): Int {
+        val db = writableDatabase
+        return db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id.toString()))
     }
 }

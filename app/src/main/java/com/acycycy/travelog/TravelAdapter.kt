@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class TravelAdapter(
-    private val travelList: List<Travel>
+    private val travelList: List<Travel>,
+    private val onLongClick: (Travel) -> Unit
 ) : RecyclerView.Adapter<TravelAdapter.TravelViewHolder>() {
-
     class TravelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         val tvDate: TextView = itemView.findViewById(R.id.tvDate)
@@ -30,6 +30,7 @@ class TravelAdapter(
     override fun onBindViewHolder(
         holder: TravelViewHolder,
         position: Int
+
     ) {
 
         val travel = travelList[position]
@@ -37,6 +38,11 @@ class TravelAdapter(
         holder.tvTitle.text = travel.title
         holder.tvDate.text = travel.date
         holder.tvMemo.text = travel.memo
+
+        holder.itemView.setOnLongClickListener {
+            onLongClick(travel)
+            true
+        }
     }
 
     override fun getItemCount(): Int {

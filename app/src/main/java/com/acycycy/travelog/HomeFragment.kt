@@ -32,7 +32,23 @@ class HomeFragment : Fragment() {
         val travelList = dbHelper.getAllTravels()
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = TravelAdapter(travelList)
+
+        recyclerView.adapter = TravelAdapter(travelList) { travel ->
+
+            android.app.AlertDialog.Builder(requireContext())
+                .setTitle("삭제")
+                .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
+                .setPositiveButton("예") { _, _ ->
+
+                    dbHelper.deleteTravel(travel.id)
+
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .commit()
+                }
+                .setNegativeButton("아니오", null)
+                .show()
+        }
 
         return view
     }
