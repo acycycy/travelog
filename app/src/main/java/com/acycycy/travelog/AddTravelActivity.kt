@@ -19,6 +19,17 @@ class AddTravelActivity : AppCompatActivity() {
 
         val dbHelper = TravelDatabaseHelper(this)
 
+        val mode = intent.getStringExtra("mode")
+        val travelId = intent.getIntExtra("id", -1)
+
+        if (mode == "edit") {
+            etTitle.setText(intent.getStringExtra("title"))
+            etDate.setText(intent.getStringExtra("date"))
+            etMemo.setText(intent.getStringExtra("memo"))
+
+            btnSave.text = "수정"
+        }
+
         btnSave.setOnClickListener {
             val title = etTitle.text.toString()
             val date = etDate.text.toString()
@@ -29,13 +40,24 @@ class AddTravelActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val result = dbHelper.insertTravel(title, date, memo)
+            if (mode == "edit" && travelId != -1) {
+                val result = dbHelper.updateTravel(travelId, title, date, memo)
 
-            if (result != -1L) {
-                Toast.makeText(this, "여행 기록이 저장되었습니다", Toast.LENGTH_SHORT).show()
-                finish()
+                if (result > 0) {
+                    Toast.makeText(this, "여행 기록이 수정되었습니다", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "수정에 실패했습니다", Toast.LENGTH_SHORT).show()
+                }
             } else {
-                Toast.makeText(this, "저장에 실패했습니다", Toast.LENGTH_SHORT).show()
+                val result = dbHelper.insertTravel(title, date, memo)
+
+                if (result != -1L) {
+                    Toast.makeText(this, "여행 기록이 저장되었습니다", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "저장에 실패했습니다", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

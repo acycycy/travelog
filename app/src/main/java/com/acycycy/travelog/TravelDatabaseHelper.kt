@@ -78,4 +78,21 @@ class TravelDatabaseHelper(context: Context) :
         val db = writableDatabase
         return db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id.toString()))
     }
+
+    fun updateTravel(id: Int, title: String, date: String, memo: String): Int {
+        val db = writableDatabase
+
+        val values = ContentValues().apply {
+            put(COLUMN_TITLE, title)
+            put(COLUMN_DATE, date)
+            put(COLUMN_MEMO, memo)
+        }
+
+        return db.update(
+            TABLE_NAME,
+            values,
+            "$COLUMN_ID = ?",
+            arrayOf(id.toString())
+        )
+    }
 }

@@ -33,23 +33,78 @@ class HomeFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        recyclerView.adapter = TravelAdapter(travelList) { travel ->
+        recyclerView.adapter = TravelAdapter(
+            travelList,
 
-            android.app.AlertDialog.Builder(requireContext())
-                .setTitle("삭제")
-                .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
-                .setPositiveButton("예") { _, _ ->
+            { travel ->
+                val intent = Intent(requireContext(), AddTravelActivity::class.java)
 
-                    dbHelper.deleteTravel(travel.id)
+                intent.putExtra("mode", "edit")
+                intent.putExtra("id", travel.id)
+                intent.putExtra("title", travel.title)
+                intent.putExtra("date", travel.date)
+                intent.putExtra("memo", travel.memo)
 
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .commit()
-                }
-                .setNegativeButton("아니오", null)
-                .show()
-        }
+                startActivity(intent)
+            },
+
+            { travel ->
+                android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("삭제")
+                    .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
+                    .setPositiveButton("예") { _, _ ->
+
+                        dbHelper.deleteTravel(travel.id)
+
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .commit()
+                    }
+                    .setNegativeButton("아니오", null)
+                    .show()
+            }
+        )
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val recyclerView = view?.findViewById<RecyclerView>(R.id.recyclerViewTravel)
+        val dbHelper = TravelDatabaseHelper(requireContext())
+        val travelList = dbHelper.getAllTravels()
+
+        recyclerView?.adapter = TravelAdapter(
+            travelList,
+
+            { travel ->
+                val intent = Intent(requireContext(), AddTravelActivity::class.java)
+
+                intent.putExtra("mode", "edit")
+                intent.putExtra("id", travel.id)
+                intent.putExtra("title", travel.title)
+                intent.putExtra("date", travel.date)
+                intent.putExtra("memo", travel.memo)
+
+                startActivity(intent)
+            },
+
+            { travel ->
+                android.app.AlertDialog.Builder(requireContext())
+                    .setTitle("삭제")
+                    .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
+                    .setPositiveButton("예") { _, _ ->
+
+                        dbHelper.deleteTravel(travel.id)
+
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .commit()
+                    }
+                    .setNegativeButton("아니오", null)
+                    .show()
+            }
+        )
     }
 }
