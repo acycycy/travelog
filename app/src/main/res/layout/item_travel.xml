@@ -8,6 +8,11 @@
     android:layout_margin="8dp"
     android:background="#F5F5F5">
 
+    <ImageView
+        android:id="@+id/imageTravel"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"

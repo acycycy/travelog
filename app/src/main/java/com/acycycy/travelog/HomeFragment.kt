@@ -44,6 +44,7 @@ class HomeFragment : Fragment() {
                 intent.putExtra("title", travel.title)
                 intent.putExtra("date", travel.date)
                 intent.putExtra("memo", travel.memo)
+                intent.putExtra("imageUri", travel.imageUri)
 
                 startActivity(intent)
             },
@@ -86,6 +87,7 @@ class HomeFragment : Fragment() {
                 intent.putExtra("title", travel.title)
                 intent.putExtra("date", travel.date)
                 intent.putExtra("memo", travel.memo)
+                intent.putExtra("imageUri", travel.imageUri)
 
                 startActivity(intent)
             },

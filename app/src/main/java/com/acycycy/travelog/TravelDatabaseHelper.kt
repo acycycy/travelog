@@ -10,13 +10,14 @@ class TravelDatabaseHelper(context: Context) :
 
     companion object {
         private const val DATABASE_NAME = "travelog.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
 
         private const val TABLE_NAME = "travel"
         private const val COLUMN_ID = "id"
         private const val COLUMN_TITLE = "title"
         private const val COLUMN_DATE = "date"
         private const val COLUMN_MEMO = "memo"
+        private const val COLUMN_IMAGE_URI = "image_uri"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -25,7 +26,8 @@ class TravelDatabaseHelper(context: Context) :
                 $COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COLUMN_TITLE TEXT,
                 $COLUMN_DATE TEXT,
-                $COLUMN_MEMO TEXT
+                $COLUMN_MEMO TEXT,
+                $COLUMN_IMAGE_URI TEXT
             )
         """.trimIndent()
 
@@ -41,13 +43,14 @@ class TravelDatabaseHelper(context: Context) :
         onCreate(db)
     }
 
-    fun insertTravel(title: String, date: String, memo: String): Long {
+    fun insertTravel(title: String, date: String, memo: String, imageUri: String?): Long {
         val db = writableDatabase
 
         val values = ContentValues().apply {
             put(COLUMN_TITLE, title)
             put(COLUMN_DATE, date)
             put(COLUMN_MEMO, memo)
+            put(COLUMN_IMAGE_URI, imageUri)
         }
 
         return db.insert(TABLE_NAME, null, values)
@@ -65,8 +68,9 @@ class TravelDatabaseHelper(context: Context) :
                 val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
                 val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE))
                 val memo = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MEMO))
+                val imageUri = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE_URI))
 
-                travelList.add(Travel(id, title, date, memo))
+                travelList.add(Travel(id, title, date, memo, imageUri))
             } while (cursor.moveToNext())
         }
 
@@ -79,13 +83,14 @@ class TravelDatabaseHelper(context: Context) :
         return db.delete(TABLE_NAME, "$COLUMN_ID = ?", arrayOf(id.toString()))
     }
 
-    fun updateTravel(id: Int, title: String, date: String, memo: String): Int {
+    fun updateTravel(id: Int, title: String, date: String, memo: String, imageUri: String?): Int {
         val db = writableDatabase
 
         val values = ContentValues().apply {
             put(COLUMN_TITLE, title)
             put(COLUMN_DATE, date)
             put(COLUMN_MEMO, memo)
+            put(COLUMN_IMAGE_URI, imageUri)
         }
 
         return db.update(
@@ -94,5 +99,23 @@ class TravelDatabaseHelper(context: Context) :
             "$COLUMN_ID = ?",
             arrayOf(id.toString())
         )
+    }
+
+    fun getTravelCount(): Int {
+        val db = readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM $TABLE_NAME",
+            null
+        )
+
+        var count = 0
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+
+        cursor.close()
+        return count
     }
 }

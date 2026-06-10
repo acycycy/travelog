@@ -4,5 +4,6 @@ data class Travel(
     val id: Int,
     val title: String,
     val date: String,
-    val memo: String
+    val memo: String,
+    val imageUri: String?
 )
