@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
 
 class AddTravelActivity : AppCompatActivity() {
 
@@ -25,16 +26,21 @@ class AddTravelActivity : AppCompatActivity() {
         var selectedImageUri: Uri? = null
 
         val imagePickerLauncher =
-            registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
 
                 if (uri != null) {
                     selectedImageUri = uri
                     imagePreview.setImageURI(uri)
+
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
                 }
             }
 
         btnSelectImage.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
+            imagePickerLauncher.launch(arrayOf("image/*"))
         }
 
         val dbHelper = TravelDatabaseHelper(this)
@@ -44,9 +50,14 @@ class AddTravelActivity : AppCompatActivity() {
         val existingImageUri = intent.getStringExtra("imageUri")
 
         if (mode == "edit") {
-            if (existingImageUri != null) {
-                selectedImageUri = Uri.parse(existingImageUri)
-                imagePreview.setImageURI(selectedImageUri)
+            if (!existingImageUri.isNullOrBlank()) {
+                try {
+                    selectedImageUri = Uri.parse(existingImageUri)
+                    imagePreview.setImageURI(selectedImageUri)
+                } catch (e: Exception) {
+                    selectedImageUri = null
+                    imagePreview.setImageDrawable(null)
+                }
             }
 
             etTitle.setText(intent.getStringExtra("title"))

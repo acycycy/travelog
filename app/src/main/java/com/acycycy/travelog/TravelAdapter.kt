@@ -47,10 +47,25 @@ class TravelAdapter(
         holder.tvDate.text = travel.date
         holder.tvMemo.text = travel.memo
 
-        if (travel.imageUri != null) {
-            holder.imageTravel.setImageURI(
-                Uri.parse(travel.imageUri)
-            )
+        if (!travel.imageUri.isNullOrBlank()) {
+            try {
+                val uri = Uri.parse(travel.imageUri)
+
+                val inputStream =
+                    holder.itemView.context.contentResolver.openInputStream(uri)
+
+                val bitmap =
+                    android.graphics.BitmapFactory.decodeStream(inputStream)
+
+                holder.imageTravel.visibility = View.VISIBLE
+                holder.imageTravel.setImageBitmap(bitmap)
+
+                inputStream?.close()
+            } catch (e: Exception) {
+                holder.imageTravel.visibility = View.GONE
+            }
+        } else {
+            holder.imageTravel.visibility = View.GONE
         }
 
         holder.itemView.setOnClickListener {
