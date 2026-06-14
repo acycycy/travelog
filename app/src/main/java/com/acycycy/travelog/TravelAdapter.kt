@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import android.net.Uri
 import android.widget.ImageView
+import android.widget.PopupMenu
 
 class TravelAdapter(
     private val travelList: List<Travel>,
@@ -73,7 +74,30 @@ class TravelAdapter(
         }
 
         holder.itemView.setOnLongClickListener {
-            onLongClick(travel)
+
+            val popupMenu = PopupMenu(holder.itemView.context, holder.itemView)
+
+            popupMenu.menu.add("수정")
+            popupMenu.menu.add("삭제")
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+
+                when (menuItem.title) {
+                    "수정" -> {
+                        onClick(travel)
+                        true
+                    }
+
+                    "삭제" -> {
+                        onLongClick(travel)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+            popupMenu.show()
             true
         }
     }

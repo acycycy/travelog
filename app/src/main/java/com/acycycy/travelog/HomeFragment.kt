@@ -1,19 +1,26 @@
 package com.acycycy.travelog
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Intent
-import android.widget.Button
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.EditText
 
 class HomeFragment : Fragment() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var etSearch: EditText
+    private lateinit var dbHelper: TravelDatabaseHelper
+
+    private var currentList: List<Travel> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,58 +29,67 @@ class HomeFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewTravel)
-
+        recyclerView = view.findViewById(R.id.recyclerViewTravel)
+        etSearch = view.findViewById(R.id.etSearch)
         val btnAddTravel = view.findViewById<Button>(R.id.btnAddTravel)
+
+        dbHelper = TravelDatabaseHelper(requireContext())
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         btnAddTravel.setOnClickListener {
             val intent = Intent(requireContext(), AddTravelActivity::class.java)
             startActivity(intent)
         }
 
-        val etSearch = view.findViewById<EditText>(R.id.etSearch)
+        setupSearch()
+        loadTravelsLatest()
 
-        val dbHelper = TravelDatabaseHelper(requireContext())
-        val travelList = dbHelper.getAllTravels()
-        var filteredList = travelList
+        return view
+    }
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    override fun onResume() {
+        super.onResume()
+        if (::dbHelper.isInitialized) {
+            loadTravelsLatest()
+        }
+    }
 
+    private fun setAdapter(list: List<Travel>) {
         recyclerView.adapter = TravelAdapter(
-            travelList,
-
-            { travel ->
-                val intent = Intent(requireContext(), AddTravelActivity::class.java)
-
-                intent.putExtra("mode", "edit")
-                intent.putExtra("id", travel.id)
-                intent.putExtra("title", travel.title)
-                intent.putExtra("date", travel.date)
-                intent.putExtra("memo", travel.memo)
-                intent.putExtra("imageUri", travel.imageUri)
-
-                startActivity(intent)
-            },
-
-            { travel ->
-                android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("삭제")
-                    .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
-                    .setPositiveButton("예") { _, _ ->
-
-                        dbHelper.deleteTravel(travel.id)
-
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, HomeFragment())
-                            .commit()
-                    }
-                    .setNegativeButton("아니오", null)
-                    .show()
-            }
+            list,
+            { travel -> openEditScreen(travel) },
+            { travel -> showDeleteDialog(travel) }
         )
+    }
 
+    private fun openEditScreen(travel: Travel) {
+        val intent = Intent(requireContext(), AddTravelActivity::class.java)
+
+        intent.putExtra("mode", "edit")
+        intent.putExtra("id", travel.id)
+        intent.putExtra("title", travel.title)
+        intent.putExtra("date", travel.date)
+        intent.putExtra("memo", travel.memo)
+        intent.putExtra("imageUri", travel.imageUri)
+
+        startActivity(intent)
+    }
+
+    private fun showDeleteDialog(travel: Travel) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("삭제")
+            .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
+            .setPositiveButton("예") { _, _ ->
+                dbHelper.deleteTravel(travel.id)
+                loadTravelsLatest()
+            }
+            .setNegativeButton("아니오", null)
+            .show()
+    }
+
+    private fun setupSearch() {
         etSearch.addTextChangedListener(object : TextWatcher {
-
             override fun beforeTextChanged(
                 s: CharSequence?,
                 start: Int,
@@ -87,85 +103,27 @@ class HomeFragment : Fragment() {
                 before: Int,
                 count: Int
             ) {
-
                 val keyword = s.toString().lowercase()
 
-                filteredList = travelList.filter {
+                val filteredList = currentList.filter {
                     it.title.lowercase().contains(keyword) ||
                             it.memo.lowercase().contains(keyword)
                 }
 
-                recyclerView.adapter = TravelAdapter(
-                    filteredList,
-                    { travel ->
-                        val intent = Intent(requireContext(), AddTravelActivity::class.java)
-
-                        intent.putExtra("mode", "edit")
-                        intent.putExtra("id", travel.id)
-                        intent.putExtra("title", travel.title)
-                        intent.putExtra("date", travel.date)
-                        intent.putExtra("memo", travel.memo)
-                        intent.putExtra("imageUri", travel.imageUri)
-
-                        startActivity(intent)
-                    },
-                    { travel ->
-                        android.app.AlertDialog.Builder(requireContext())
-                            .setTitle("삭제")
-                            .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
-                            .setPositiveButton("예") { _, _ ->
-                                dbHelper.deleteTravel(travel.id)
-                            }
-                            .setNegativeButton("아니오", null)
-                            .show()
-                    }
-                )
+                setAdapter(filteredList)
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-
-        return view
     }
 
-    override fun onResume() {
-        super.onResume()
+    fun loadTravelsLatest() {
+        currentList = dbHelper.getAllTravels()
+        setAdapter(currentList)
+    }
 
-        val recyclerView = view?.findViewById<RecyclerView>(R.id.recyclerViewTravel)
-        val dbHelper = TravelDatabaseHelper(requireContext())
-        val travelList = dbHelper.getAllTravels()
-
-        recyclerView?.adapter = TravelAdapter(
-            travelList,
-
-            { travel ->
-                val intent = Intent(requireContext(), AddTravelActivity::class.java)
-
-                intent.putExtra("mode", "edit")
-                intent.putExtra("id", travel.id)
-                intent.putExtra("title", travel.title)
-                intent.putExtra("date", travel.date)
-                intent.putExtra("memo", travel.memo)
-                intent.putExtra("imageUri", travel.imageUri)
-
-                startActivity(intent)
-            },
-
-            { travel ->
-                android.app.AlertDialog.Builder(requireContext())
-                    .setTitle("삭제")
-                    .setMessage("${travel.title} 을(를) 삭제하시겠습니까?")
-                    .setPositiveButton("예") { _, _ ->
-
-                        dbHelper.deleteTravel(travel.id)
-
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, HomeFragment())
-                            .commit()
-                    }
-                    .setNegativeButton("아니오", null)
-                    .show()
-            }
-        )
+    fun loadTravelsOldest() {
+        currentList = dbHelper.getAllTravels().reversed()
+        setAdapter(currentList)
     }
 }

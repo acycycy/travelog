@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.acycycy.travelog.databinding.ActivityMainBinding
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +39,40 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_option, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val currentFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+        when (item.itemId) {
+
+            R.id.menu_latest -> {
+                if (currentFragment is HomeFragment) {
+                    currentFragment.loadTravelsLatest()
+                }
+
+                Toast.makeText(this, "최신순 정렬", Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            R.id.menu_oldest -> {
+                if (currentFragment is HomeFragment) {
+                    currentFragment.loadTravelsOldest()
+                }
+
+                Toast.makeText(this, "오래된순 정렬", Toast.LENGTH_SHORT).show()
+                return true
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun replaceFragment(fragment: Fragment) {
