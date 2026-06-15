@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.util.Pair as AndroidPair
+import androidx.exifinterface.media.ExifInterface
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
@@ -46,6 +47,8 @@ class AddTravelActivity : AppCompatActivity() {
                     contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     photoEntries.add(uri)
                     addPhotoView(uri, "")
+                    // 위치 미설정 시 사진 EXIF GPS 자동 추출
+                    if (selectedLocation.isNullOrBlank()) extractGpsFromPhoto(uri)
                 } catch (e: Exception) {
                     Toast.makeText(this, "사진을 불러올 수 없습니다", Toast.LENGTH_SHORT).show()
                 }
@@ -222,6 +225,26 @@ class AddTravelActivity : AppCompatActivity() {
             field.setText("${sdf.format(Date(selection.first))} ~ ${sdf.format(Date(selection.second))}")
         }
         picker.show(supportFragmentManager, "travel_date_range")
+    }
+
+    private fun extractGpsFromPhoto(uri: Uri) {
+        scope.launch {
+            val latLng = withContext(Dispatchers.IO) {
+                try {
+                    contentResolver.openInputStream(uri)?.use { stream ->
+                        val exif = ExifInterface(stream)
+                        val latLong = FloatArray(2)
+                        if (exif.getLatLong(latLong)) LatLng(latLong[0].toDouble(), latLong[1].toDouble())
+                        else null
+                    }
+                } catch (e: Exception) { null }
+            }
+            if (latLng != null) {
+                selectedLocation = "${latLng.latitude},${latLng.longitude}"
+                tvSelectedLocation.text = "📍 사진에서 위치 감지됨"
+                tvSelectedLocation.setTextColor(0xFF26A69A.toInt())
+            }
+        }
     }
 
     override fun onDestroy() { super.onDestroy(); scope.cancel() }
