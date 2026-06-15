@@ -8,8 +8,8 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +18,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var etSearch: EditText
+    private lateinit var emptyState: LinearLayout
     private lateinit var dbHelper: TravelDatabaseHelper
 
     private var currentList: List<Travel> = emptyList()
@@ -31,7 +32,8 @@ class HomeFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerViewTravel)
         etSearch = view.findViewById(R.id.etSearch)
-        val btnAddTravel = view.findViewById<Button>(R.id.btnAddTravel)
+        emptyState = view.findViewById(R.id.emptyState)
+        val btnAddTravel = view.findViewById<View>(R.id.btnAddTravel)
 
         dbHelper = TravelDatabaseHelper(requireContext())
 
@@ -56,6 +58,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun setAdapter(list: List<Travel>) {
+        if (list.isEmpty() && etSearch.text.isBlank()) {
+            recyclerView.visibility = View.GONE
+            emptyState.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+            emptyState.visibility = View.GONE
+        }
         recyclerView.adapter = TravelAdapter(
             list,
             { travel -> openDetailScreen(travel) },
@@ -71,6 +80,8 @@ class HomeFragment : Fragment() {
         intent.putExtra("date", travel.date)
         intent.putExtra("memo", travel.memo)
         intent.putExtra("imageUri", travel.imageUri)
+        intent.putExtra("rating", travel.rating)
+        intent.putExtra("location", travel.location)
         startActivity(intent)
     }
 
@@ -82,6 +93,8 @@ class HomeFragment : Fragment() {
         intent.putExtra("date", travel.date)
         intent.putExtra("memo", travel.memo)
         intent.putExtra("imageUri", travel.imageUri)
+        intent.putExtra("rating", travel.rating)
+        intent.putExtra("location", travel.location)
         startActivity(intent)
     }
 
@@ -99,26 +112,14 @@ class HomeFragment : Fragment() {
 
     private fun setupSearch() {
         etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence?,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(
-                s: CharSequence?,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val keyword = s.toString().lowercase()
-
                 val filteredList = currentList.filter {
                     it.title.lowercase().contains(keyword) ||
                             it.memo.lowercase().contains(keyword)
                 }
-
                 setAdapter(filteredList)
             }
 

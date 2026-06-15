@@ -14,33 +14,19 @@ class StatsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val view = inflater.inflate(R.layout.fragment_stats, container, false)
 
-        val view = inflater.inflate(
-            R.layout.fragment_stats,
-            container,
-            false
-        )
-
-        val tvTravelCount =
-            view.findViewById<TextView>(R.id.tvTravelCount)
-
-        val tvRecentTravel =
-            view.findViewById<TextView>(R.id.tvRecentTravel)
+        val tvTravelCount = view.findViewById<TextView>(R.id.tvTravelCount)
+        val tvThisMonthCount = view.findViewById<TextView>(R.id.tvThisMonthCount)
+        val tvRecentTravel = view.findViewById<TextView>(R.id.tvRecentTravel)
 
         val dbHelper = TravelDatabaseHelper(requireContext())
 
-        val count = dbHelper.getTravelCount()
+        tvTravelCount.text = dbHelper.getTravelCount().toString()
+        tvThisMonthCount.text = dbHelper.getThisMonthCount().toString()
+
         val travelList = dbHelper.getAllTravels()
-
-        tvTravelCount.text = "총 여행 수 : $count"
-
-        if (travelList.isNotEmpty()) {
-            tvRecentTravel.text =
-                "최근 여행 : ${travelList[0].title}"
-        } else {
-            tvRecentTravel.text =
-                "최근 여행 : 없음"
-        }
+        tvRecentTravel.text = if (travelList.isNotEmpty()) travelList[0].title else "없음"
 
         return view
     }

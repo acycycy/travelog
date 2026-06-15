@@ -3,12 +3,17 @@
 
     <item
         android:id="@+id/menu_home"
-        android:title="Home"
+        android:title="홈"
         android:icon="@android:drawable/ic_menu_view"/>
 
     <item
+        android:id="@+id/menu_plan"
+        android:title="계획"
+        android:icon="@drawable/ic_plan"/>
+
+    <item
         android:id="@+id/menu_stats"
-        android:title="Stats"
+        android:title="통계"
         android:icon="@android:drawable/ic_menu_info_details"/>
 
 </menu>

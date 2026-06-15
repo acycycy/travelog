@@ -3,18 +3,36 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
-    <EditText
-        android:id="@+id/etSearch"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/searchCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="여행 검색"
-        android:padding="12dp"
-        android:layout_margin="12dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="3dp"
+        app:strokeWidth="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="여행지 검색..."
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="14dp"
+            android:background="@null"
+            android:textSize="15sp"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTravel"
@@ -22,18 +40,56 @@
         android:layout_height="0dp"
         android:paddingBottom="80dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/etSearch"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/searchCard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✈️"
+            android:textSize="48sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아직 여행 기록이 없어요"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 버튼을 눌러 첫 여행을 기록해보세요"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddTravel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+"
-        android:textSize="24sp"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
+        android:contentDescription="여행 추가"
+        app:srcCompat="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

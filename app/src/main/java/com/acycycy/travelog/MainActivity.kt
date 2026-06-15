@@ -19,12 +19,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 처음 화면 (백스택 없이)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, HomeFragment())
             .commit()
 
-        // 뒤로가기: 백스택 있으면 팝, 없으면 앱 종료
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (supportFragmentManager.backStackEntryCount > 0) {
@@ -35,21 +33,20 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 아래 탭 클릭 이벤트
         binding.bottomNavigation.setOnItemSelectedListener {
-
             when (it.itemId) {
-
                 R.id.menu_home -> {
                     replaceFragment(HomeFragment())
                     true
                 }
-
+                R.id.menu_plan -> {
+                    replaceFragment(PlanFragment())
+                    true
+                }
                 R.id.menu_stats -> {
                     replaceFragment(StatsFragment())
                     true
                 }
-
                 else -> false
             }
         }
@@ -61,31 +58,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val currentFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_container)
-
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         when (item.itemId) {
-
             R.id.menu_latest -> {
-                if (currentFragment is HomeFragment) {
-                    currentFragment.loadTravelsLatest()
+                when (currentFragment) {
+                    is HomeFragment -> currentFragment.loadTravelsLatest()
+                    is PlanFragment -> currentFragment.loadPlansLatest()
                 }
-
                 Toast.makeText(this, "최신순 정렬", Toast.LENGTH_SHORT).show()
                 return true
             }
-
             R.id.menu_oldest -> {
-                if (currentFragment is HomeFragment) {
-                    currentFragment.loadTravelsOldest()
+                when (currentFragment) {
+                    is HomeFragment -> currentFragment.loadTravelsOldest()
+                    is PlanFragment -> currentFragment.loadPlansOldest()
                 }
-
                 Toast.makeText(this, "오래된순 정렬", Toast.LENGTH_SHORT).show()
                 return true
             }
         }
-
         return super.onOptionsItemSelected(item)
     }
 

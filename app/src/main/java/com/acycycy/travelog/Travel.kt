@@ -5,5 +5,7 @@ data class Travel(
     val title: String,
     val date: String,
     val memo: String,
-    val imageUri: String?
+    val imageUri: String?,
+    val rating: Int = 0,
+    val location: String? = null  // "lat,lng" 형식
 )
