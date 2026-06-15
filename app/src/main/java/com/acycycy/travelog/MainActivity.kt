@@ -7,6 +7,7 @@ import com.acycycy.travelog.databinding.ActivityMainBinding
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,8 +19,21 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 처음 화면
-        replaceFragment(HomeFragment())
+        // 처음 화면 (백스택 없이)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, HomeFragment())
+            .commit()
+
+        // 뒤로가기: 백스택 있으면 팝, 없으면 앱 종료
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                } else {
+                    finish()
+                }
+            }
+        })
 
         // 아래 탭 클릭 이벤트
         binding.bottomNavigation.setOnItemSelectedListener {
@@ -76,9 +90,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun replaceFragment(fragment: Fragment) {
-
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
             .commit()
     }
 }

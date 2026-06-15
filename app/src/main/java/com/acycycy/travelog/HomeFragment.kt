@@ -58,21 +58,30 @@ class HomeFragment : Fragment() {
     private fun setAdapter(list: List<Travel>) {
         recyclerView.adapter = TravelAdapter(
             list,
+            { travel -> openDetailScreen(travel) },
             { travel -> openEditScreen(travel) },
             { travel -> showDeleteDialog(travel) }
         )
     }
 
+    private fun openDetailScreen(travel: Travel) {
+        val intent = Intent(requireContext(), TravelDetailActivity::class.java)
+        intent.putExtra("id", travel.id)
+        intent.putExtra("title", travel.title)
+        intent.putExtra("date", travel.date)
+        intent.putExtra("memo", travel.memo)
+        intent.putExtra("imageUri", travel.imageUri)
+        startActivity(intent)
+    }
+
     private fun openEditScreen(travel: Travel) {
         val intent = Intent(requireContext(), AddTravelActivity::class.java)
-
         intent.putExtra("mode", "edit")
         intent.putExtra("id", travel.id)
         intent.putExtra("title", travel.title)
         intent.putExtra("date", travel.date)
         intent.putExtra("memo", travel.memo)
         intent.putExtra("imageUri", travel.imageUri)
-
         startActivity(intent)
     }
 

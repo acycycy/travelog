@@ -20,8 +20,10 @@
         android:id="@+id/recyclerViewTravel"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/etSearch"
-        app:layout_constraintBottom_toTopOf="@id/btnAddTravel"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

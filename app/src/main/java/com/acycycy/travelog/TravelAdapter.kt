@@ -12,6 +12,7 @@ import android.widget.PopupMenu
 class TravelAdapter(
     private val travelList: List<Travel>,
     private val onClick: (Travel) -> Unit,
+    private val onEditClick: (Travel) -> Unit,
     private val onLongClick: (Travel) -> Unit
 ) : RecyclerView.Adapter<TravelAdapter.TravelViewHolder>() {
     class TravelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -84,7 +85,7 @@ class TravelAdapter(
 
                 when (menuItem.title) {
                     "수정" -> {
-                        onClick(travel)
+                        onEditClick(travel)
                         true
                     }
 
